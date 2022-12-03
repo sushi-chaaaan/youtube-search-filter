@@ -1,11 +1,20 @@
 env:
-    browser: true
-    commonjs: true
-    es2021: true
-    node: true
-    webextensions: true
-extends: ["eslint:recommended", "prettier"]
+  browser: true
+  commonjs: true
+  es2021: true
+  webextensions: true
+plugins:
+  - "@typescript-eslint"
+extends:
+  - eslint:recommended
+  - plugin:@typescript-eslint/eslint-recommended
+  - plugin:@typescript-eslint/recommended
+  - prettier
+  - prettier/@typescript-eslint
 overrides: []
+parser: "@typescript-eslint/parser"
 parserOptions:
-    ecmaVersion: latest
+  ecmaVersion: latest
+  sourceType: module
+  project: ./tsconfig.json
 rules: {}
