@@ -20,3 +20,34 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
   return true
 })
+
+chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+  if (changeInfo.status === "complete") {
+    console.log(`got url: ${tab.url}`)
+    const filter = generate_filter()
+    const check_pattern = generate_filter(true)
+
+    // 処理
+    if (
+      tab.url.match(/https?:\/\/www.youtube.com\/results?/) &&
+      !tab.url.includes(check_pattern)
+    ) {
+      console.log("url matched. adding filter")
+      const new_url = tab.url + "+" + filter
+      chrome.tabs.update(tabId, { url: new_url })
+    }
+  }
+  return true
+})
+
+function generate_filter(regex = false) {
+  const filter_array = ["somen", "からしな"]
+  let filter = null
+  if (regex) {
+    filter = filter_array.map((item) => encodeURIComponent(item)).join("+")
+  } else {
+    filter = filter_array.join("+")
+  }
+  console.log(`filter: ${filter}, regex: ${regex}`)
+  return filter
+}

@@ -16,12 +16,13 @@
     "default_title": "Youtube Search-filter",
     "default_popup": "popup.html"
   },
-  "permissions": ["storage"],
+  "permissions": ["storage", "tabs"],
+  "host_permissions": ["https://www.youtube.com/*"],
   "content_scripts": [
     {
       "matches": ["https://www.youtube.com/*"],
       "run_at": "document_idle",
-      "js": ["background.js", "contentScript.js"]
+      "js": ["contentScript.js"]
     }
   ]
 }
