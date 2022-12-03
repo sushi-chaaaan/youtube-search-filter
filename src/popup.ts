@@ -11,13 +11,11 @@ import "./popup.css"
   // https://developer.chrome.com/extensions/declare_permissions
   const AvailableStorage = {
     get: (callback: (arg0: boolean) => void) => {
-      // TODO: 型推論したので、あとから精査
       chrome.storage.sync.get(["available"], (result) => {
         callback(result.available)
       })
     },
     set: (value: boolean, callback: () => void) => {
-      // TODO: 型推論したので、あとから精査
       chrome.storage.sync.set(
         {
           available: value,
