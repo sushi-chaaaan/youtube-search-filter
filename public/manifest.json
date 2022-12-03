@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Youtube Search-filter",
+  "name": "Youtube Search Filter",
   "version": "0.1.0",
-  "description": "My Chrome Extension",
+  "description": "Add a filter to the Youtube search page",
   "icons": {
     "128": "icons/search_off.png"
   },
