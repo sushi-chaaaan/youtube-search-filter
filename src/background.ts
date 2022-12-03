@@ -5,13 +5,15 @@
 // For more information on background script,
 // See https://developer.chrome.com/extensions/background_pages
 
+import { FILTER_AVAILABLE, FILTER_UNAVAILABLE } from "./constant"
+
 let available = false
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((request) => {
   if (request.type === "TOGGLE_SWITCH") {
     available = request.payload.isChecked
 
-    available ? console.log("available") : console.log("not available")
+    available ? console.log(FILTER_AVAILABLE) : console.log(FILTER_UNAVAILABLE)
   }
   return true
 })

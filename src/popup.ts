@@ -1,6 +1,7 @@
 "use strict"
 
 import "./popup.css"
+import { FILTER_AVAILABLE, FILTER_UNAVAILABLE } from "./constant"
 ;(function () {
   // We will make use of Storage API to get and store `count` value
   // More information on Storage API can we found at
@@ -55,7 +56,7 @@ import "./popup.css"
       })
 
       // Store the value of `available` in storage
-      AvailableStorage.set(isChecked, () => {})
+      AvailableStorage.set(isChecked, () => undefined)
     })
   }
 
@@ -63,7 +64,7 @@ import "./popup.css"
     const ToggleMessage = <HTMLInputElement>(
       document.getElementById("toggle-message")
     )
-    ToggleMessage.innerText = available ? "ON" : "OFF"
+    ToggleMessage.innerText = available ? FILTER_AVAILABLE : FILTER_UNAVAILABLE
   }
 
   function restoreToggleSwitch() {
@@ -71,7 +72,7 @@ import "./popup.css"
     AvailableStorage.get((available: boolean) => {
       if (typeof available === "undefined") {
         // Set counter value as 0
-        AvailableStorage.set(false, () => {})
+        AvailableStorage.set(false, () => undefined)
       }
       setupToggleSwitch()
     })
