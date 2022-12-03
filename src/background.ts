@@ -1,7 +1,5 @@
 "use strict"
 
-// See https://developer.chrome.com/extensions/background_pages
-
 import { AvailableStorage } from "./storage"
 import { FILTER_AVAILABLE, FILTER_UNAVAILABLE } from "./constant"
 
