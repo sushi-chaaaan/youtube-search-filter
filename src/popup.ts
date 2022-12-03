@@ -11,11 +11,13 @@ import "./popup.css"
   // https://developer.chrome.com/extensions/declare_permissions
   const counterStorage = {
     get: (cb: (arg0: any) => void) => {
+      // TODO: 型推論したので、あとから精査
       chrome.storage.sync.get(["count"], (result) => {
         cb(result.count)
       })
     },
     set: (value: any, cb: () => void) => {
+      // TODO: 型推論したので、あとから精査
       chrome.storage.sync.set(
         {
           count: value,
