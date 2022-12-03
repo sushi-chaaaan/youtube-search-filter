@@ -140,3 +140,5 @@ dist
 .yarn/install-state.gz
 .pnp.*
 size-plugin.json
+
+*.zip
