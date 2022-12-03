@@ -36,10 +36,8 @@ import "./popup.css"
 
     // Get the current value of `available` from storage
     AvailableStorage.get((available: boolean) => {
-      // Set the value of `available` to the toggle switch
       toggleSwitch.checked = available
-      // Set the message of toggle switch
-      // Set the message of toggle switch
+
       updateToggleMessage(available)
     })
 
@@ -58,7 +56,7 @@ import "./popup.css"
         },
       })
 
-      // Store the value of `count` in storage
+      // Store the value of `available` in storage
       AvailableStorage.set(isChecked, () => {})
     })
   }
