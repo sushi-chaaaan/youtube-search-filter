@@ -1,7 +1,6 @@
 {
   "manifest_version": 3,
   "name": "Youtube Search-filter",
-  "$schema": "https://json.schemastore.org/chrome-manifest.json",
   "version": "0.1.0",
   "description": "My Chrome Extension",
   "icons": {
@@ -20,7 +19,7 @@
   "permissions": ["storage"],
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
+      "matches": ["https://www.youtube.com/*"],
       "run_at": "document_idle",
       "js": ["background.js", "contentScript.js"]
     }
