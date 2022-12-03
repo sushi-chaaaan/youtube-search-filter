@@ -10,18 +10,14 @@ import { AvailableStorage } from "./storage"
     )
     // set toggle switch to the current value
     toggleSwitch.checked = available
+    writeToggleMessage(available)
 
     // Popup上での切り替えを検知
     toggleSwitch.onchange = () => {
       available = toggleSwitch.checked
       AvailableStorage.set(available, () => undefined)
 
-      const ToggleMessage = <HTMLInputElement>(
-        document.getElementById("toggle-message")
-      )
-      ToggleMessage.innerText = available
-        ? FILTER_AVAILABLE
-        : FILTER_UNAVAILABLE
+      writeToggleMessage(available)
     }
   }
 
@@ -33,6 +29,13 @@ import { AvailableStorage } from "./storage"
       }
       setupToggleSwitch(available)
     })
+  }
+
+  function writeToggleMessage(available: boolean) {
+    const ToggleMessage = <HTMLInputElement>(
+      document.getElementById("toggle-message")
+    )
+    ToggleMessage.innerText = available ? FILTER_AVAILABLE : FILTER_UNAVAILABLE
   }
 
   chrome.storage.onChanged.addListener(function (changes, area) {
