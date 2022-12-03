@@ -71,7 +71,7 @@ import "./popup.css"
                 count: newCount,
               },
             },
-            (response) => {
+            () => {
               console.log("Current count value passed to contentScript file")
             }
           )

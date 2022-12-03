@@ -17,18 +17,26 @@ console.log(
   `Page title is: '${pageTitle}' - evaluated by Chrome extension's 'contentScript.js' file`
 )
 
+greet()
+
 // Communicate with background file by sending a message
-chrome.runtime.sendMessage(
-  {
-    type: "GREETINGS",
-    payload: {
-      message: "Hello, my name is Con. I am from ContentScript.",
+function greet() {
+  chrome.runtime.sendMessage(
+    {
+      type: "GREETINGS",
+      payload: {
+        message: "Hello, my name is Con. I am from ContentScript.",
+      },
     },
-  },
-  (response) => {
-    console.log(response.message)
-  }
-)
+    (response) => {
+      if (chrome.runtime.lastError) {
+        setTimeout(greet, 1000)
+      } else {
+        console.log(response.message)
+      }
+    }
+  )
+}
 
 // Listen for message
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {

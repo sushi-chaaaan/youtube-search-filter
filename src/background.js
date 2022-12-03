@@ -18,4 +18,5 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       message,
     })
   }
+  return true
 })
