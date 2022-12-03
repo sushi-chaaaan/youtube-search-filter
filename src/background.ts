@@ -28,6 +28,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     console.log(`got url: ${tab.url}`)
     // 処理
     if (
+      tab.url &&
       tab.url.match(/https?:\/\/www.youtube.com\/results?/) &&
       !tab.url.includes(generate_filter(true)) &&
       available

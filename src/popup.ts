@@ -10,12 +10,14 @@ import "./popup.css"
   // More information on Permissions can we found at
   // https://developer.chrome.com/extensions/declare_permissions
   const counterStorage = {
-    get: (cb) => {
+    get: (cb: (arg0: any) => void) => {
+      // TODO: 型推論したので、あとから精査
       chrome.storage.sync.get(["count"], (result) => {
         cb(result.count)
       })
     },
-    set: (value, cb) => {
+    set: (value: any, cb: () => void) => {
+      // TODO: 型推論したので、あとから精査
       chrome.storage.sync.set(
         {
           count: value,
@@ -28,24 +30,31 @@ import "./popup.css"
   }
 
   function setupCounter(initialValue = 0) {
-    document.getElementById("counter").innerHTML = initialValue
+    const counter = <HTMLInputElement>document.getElementById("counter")
+    counter.innerHTML = String(initialValue)
 
-    document.getElementById("incrementBtn").addEventListener("click", () => {
+    const incrementButton = <HTMLButtonElement>(
+      document.getElementById("incrementBtn")
+    )
+    incrementButton.addEventListener("click", () => {
       updateCounter({
         type: "INCREMENT",
       })
     })
 
-    document.getElementById("decrementBtn").addEventListener("click", () => {
+    const decrementButton = <HTMLButtonElement>(
+      document.getElementById("decrementBtn")
+    )
+    decrementButton.addEventListener("click", () => {
       updateCounter({
         type: "DECREMENT",
       })
     })
   }
 
-  function updateCounter({ type }) {
+  function updateCounter({ type }: { type: string }) {
     counterStorage.get((count) => {
-      let newCount
+      let newCount: number
 
       if (type === "INCREMENT") {
         newCount = count + 1
@@ -56,25 +65,28 @@ import "./popup.css"
       }
 
       counterStorage.set(newCount, () => {
-        document.getElementById("counter").innerHTML = newCount
+        const counter = <HTMLInputElement>document.getElementById("counter")
+        counter.innerHTML = String(newCount)
 
         // Communicate with content script of
         // active tab by sending a message
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
           const tab = tabs[0]
 
-          chrome.tabs.sendMessage(
-            tab.id,
-            {
-              type: "COUNT",
-              payload: {
-                count: newCount,
+          if (tab && tab.id) {
+            chrome.tabs.sendMessage(
+              tab.id,
+              {
+                type: "COUNT",
+                payload: {
+                  count: newCount,
+                },
               },
-            },
-            () => {
-              console.log("Current count value passed to contentScript file")
-            }
-          )
+              () => {
+                console.log("Current count value passed to contentScript file")
+              }
+            )
+          }
         })
       })
     })
