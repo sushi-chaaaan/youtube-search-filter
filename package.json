@@ -7,7 +7,8 @@
     "preinstall": "typesync || :",
     "watch": "node ./node_modules/webpack/bin/webpack.js --mode=development --watch --config config/webpack.config.js",
     "build": "node ./node_modules/webpack/bin/webpack.js --mode=production --config config/webpack.config.js",
-    "format": "prettier --write 'src/**/*.ts' && eslint ./src/"
+    "format": "prettier --write 'src/**/*.ts' && eslint ./src/",
+    "zip": "zip -r youtube-search-filter.zip build/"
   },
   "devDependencies": {
     "@types/chrome": "^0.0.203",
