@@ -4,13 +4,14 @@
   "version": "0.1.0",
   "description": "Add a filter to the Youtube search page",
   "icons": {
-    "128": "icons/search_off.png"
+    "48": "icons/search_on.png"
   },
   "background": {
     "service_worker": "background.js"
   },
   "action": {
-    "default_title": "Youtube Search-filter"
+    "default_title": "Youtube Search Filter",
+    "default_popup": "popup.html"
   },
   "permissions": ["storage", "tabs"],
   "host_permissions": ["https://www.youtube.com/*"],

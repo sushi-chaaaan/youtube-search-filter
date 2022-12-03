@@ -9,104 +9,79 @@ import "./popup.css"
   // To get storage access, we have to mention it in `permissions` property of manifest.json file
   // More information on Permissions can we found at
   // https://developer.chrome.com/extensions/declare_permissions
-  const counterStorage = {
-    get: (cb: (arg0: any) => void) => {
+  const AvailableStorage = {
+    get: (callback: (arg0: boolean) => void) => {
       // TODO: 型推論したので、あとから精査
-      chrome.storage.sync.get(["count"], (result) => {
-        cb(result.count)
+      chrome.storage.sync.get(["available"], (result) => {
+        callback(result.available)
       })
     },
-    set: (value: any, cb: () => void) => {
+    set: (value: boolean, callback: () => void) => {
       // TODO: 型推論したので、あとから精査
       chrome.storage.sync.set(
         {
-          count: value,
+          available: value,
         },
         () => {
-          cb()
+          callback()
         }
       )
     },
   }
 
-  function setupCounter(initialValue = 0) {
-    const counter = <HTMLInputElement>document.getElementById("counter")
-    counter.innerHTML = String(initialValue)
-
-    const incrementButton = <HTMLButtonElement>(
-      document.getElementById("incrementBtn")
+  function setupToggleSwitch() {
+    const toggleSwitch = <HTMLInputElement>(
+      document.getElementById("toggle-switch")
     )
-    incrementButton.addEventListener("click", () => {
-      updateCounter({
-        type: "INCREMENT",
-      })
+
+    // Get the current value of `available` from storage
+    AvailableStorage.get((available: boolean) => {
+      // Set the value of `available` to the toggle switch
+      toggleSwitch.checked = available
+      // Set the message of toggle switch
+      // Set the message of toggle switch
+      updateToggleMessage(available)
     })
 
-    const decrementButton = <HTMLButtonElement>(
-      document.getElementById("decrementBtn")
-    )
-    decrementButton.addEventListener("click", () => {
-      updateCounter({
-        type: "DECREMENT",
+    toggleSwitch.addEventListener("change", (event) => {
+      const target = event.target as HTMLInputElement
+      const isChecked = target.checked
+
+      // Set the message of toggle switch
+      updateToggleMessage(isChecked)
+
+      // send message to background script
+      chrome.runtime.sendMessage({
+        type: "TOGGLE_SWITCH",
+        payload: {
+          isChecked,
+        },
       })
+
+      // Store the value of `count` in storage
+      AvailableStorage.set(isChecked, () => {})
     })
   }
 
-  function updateCounter({ type }: { type: string }) {
-    counterStorage.get((count) => {
-      let newCount: number
-
-      if (type === "INCREMENT") {
-        newCount = count + 1
-      } else if (type === "DECREMENT") {
-        newCount = count - 1
-      } else {
-        newCount = count
-      }
-
-      counterStorage.set(newCount, () => {
-        const counter = <HTMLInputElement>document.getElementById("counter")
-        counter.innerHTML = String(newCount)
-
-        // Communicate with content script of
-        // active tab by sending a message
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-          const tab = tabs[0]
-
-          if (tab && tab.id) {
-            chrome.tabs.sendMessage(
-              tab.id,
-              {
-                type: "COUNT",
-                payload: {
-                  count: newCount,
-                },
-              },
-              () => {
-                console.log("Current count value passed to contentScript file")
-              }
-            )
-          }
-        })
-      })
-    })
+  function updateToggleMessage(available: boolean) {
+    const ToggleMessage = <HTMLInputElement>(
+      document.getElementById("toggle-message")
+    )
+    ToggleMessage.innerText = available ? "ON" : "OFF"
   }
 
-  function restoreCounter() {
+  function restoreToggleSwitch() {
     // Restore count value
-    counterStorage.get((count) => {
-      if (typeof count === "undefined") {
+    AvailableStorage.get((available: boolean) => {
+      if (typeof available === "undefined") {
         // Set counter value as 0
-        counterStorage.set(0, () => {
-          setupCounter(0)
-        })
-      } else {
-        setupCounter(count)
+        AvailableStorage.set(false, () => {})
       }
+      setupToggleSwitch()
     })
   }
 
-  document.addEventListener("DOMContentLoaded", restoreCounter)
+  document.addEventListener("DOMContentLoaded", restoreToggleSwitch)
 
   // Communicate with background file by sending a message
   chrome.runtime.sendMessage(

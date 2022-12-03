@@ -8,6 +8,15 @@
 let available = false
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.type === "TOGGLE_SWITCH") {
+    available = request.payload.isChecked
+
+    available ? console.log("available") : console.log("not available")
+  }
+  return true
+})
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.type === "GREETINGS") {
     const message = `Hi ${
       sender.tab ? "Con" : "Pop"
@@ -53,18 +62,3 @@ function generate_filter(regex = false) {
   console.log(`filter: ${filter}, regex: ${regex}`)
   return filter
 }
-
-// eslint-disable-next-line no-unused-vars
-chrome.action.onClicked.addListener((tab) => {
-  available = !available
-
-  if (available) {
-    chrome.action.setIcon({
-      path: "icons/search_on.png",
-    })
-  } else {
-    chrome.action.setIcon({
-      path: "icons/search_off.png",
-    })
-  }
-})
