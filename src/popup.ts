@@ -41,7 +41,7 @@ import { FILTER_AVAILABLE, FILTER_UNAVAILABLE } from "./constant"
     })
 
     toggleSwitch.addEventListener("change", (event) => {
-      const target = event.target as HTMLInputElement
+      const target = <HTMLInputElement>event.target
       const isChecked = target.checked
 
       // Set the message of toggle switch

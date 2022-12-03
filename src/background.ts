@@ -11,6 +11,7 @@ let available = false
 
 chrome.runtime.onMessage.addListener((request) => {
   if (request.type === "TOGGLE_SWITCH") {
+    // toggle filter from frontend
     available = request.payload.isChecked
 
     available ? console.log(FILTER_AVAILABLE) : console.log(FILTER_UNAVAILABLE)
@@ -37,7 +38,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   if (changeInfo.status === "complete") {
     console.log(`got url: ${tab.url}`)
-    // 処理
+
     if (
       tab.url &&
       tab.url.match(/https?:\/\/www.youtube.com\/results?/) &&
@@ -55,7 +56,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 
 function generate_filter(regex = false) {
   const filter_array = ["somen", "からしな"]
-  let filter = null
+  let filter: string
   if (regex) {
     filter = filter_array.map((item) => encodeURIComponent(item)).join("+")
   } else {
