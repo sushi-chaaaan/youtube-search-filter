@@ -28,15 +28,22 @@ import "./popup.css"
   }
 
   function setupCounter(initialValue = 0) {
-    document.getElementById("counter").innerHTML = initialValue
+    const counter = <HTMLInputElement>document.getElementById("counter")
+    counter.innerHTML = String(initialValue)
 
-    document.getElementById("incrementBtn").addEventListener("click", () => {
+    const incrementButton = <HTMLButtonElement>(
+      document.getElementById("incrementBtn")
+    )
+    incrementButton.addEventListener("click", () => {
       updateCounter({
         type: "INCREMENT",
       })
     })
 
-    document.getElementById("decrementBtn").addEventListener("click", () => {
+    const decrementButton = <HTMLButtonElement>(
+      document.getElementById("decrementBtn")
+    )
+    decrementButton.addEventListener("click", () => {
       updateCounter({
         type: "DECREMENT",
       })
@@ -45,7 +52,7 @@ import "./popup.css"
 
   function updateCounter({ type }) {
     counterStorage.get((count) => {
-      let newCount
+      let newCount: number
 
       if (type === "INCREMENT") {
         newCount = count + 1
@@ -56,7 +63,8 @@ import "./popup.css"
       }
 
       counterStorage.set(newCount, () => {
-        document.getElementById("counter").innerHTML = newCount
+        const counter = <HTMLInputElement>document.getElementById("counter")
+        counter.innerHTML = String(newCount)
 
         // Communicate with content script of
         // active tab by sending a message
