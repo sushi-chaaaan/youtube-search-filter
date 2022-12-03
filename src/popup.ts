@@ -10,12 +10,12 @@ import "./popup.css"
   // More information on Permissions can we found at
   // https://developer.chrome.com/extensions/declare_permissions
   const counterStorage = {
-    get: (cb) => {
+    get: (cb: (arg0: any) => void) => {
       chrome.storage.sync.get(["count"], (result) => {
         cb(result.count)
       })
     },
-    set: (value, cb) => {
+    set: (value: any, cb: () => void) => {
       chrome.storage.sync.set(
         {
           count: value,
@@ -50,7 +50,7 @@ import "./popup.css"
     })
   }
 
-  function updateCounter({ type }) {
+  function updateCounter({ type }: { type: string }) {
     counterStorage.get((count) => {
       let newCount: number
 
@@ -71,18 +71,20 @@ import "./popup.css"
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
           const tab = tabs[0]
 
-          chrome.tabs.sendMessage(
-            tab.id,
-            {
-              type: "COUNT",
-              payload: {
-                count: newCount,
+          if (tab && tab.id) {
+            chrome.tabs.sendMessage(
+              tab.id,
+              {
+                type: "COUNT",
+                payload: {
+                  count: newCount,
+                },
               },
-            },
-            () => {
-              console.log("Current count value passed to contentScript file")
-            }
-          )
+              () => {
+                console.log("Current count value passed to contentScript file")
+              }
+            )
+          }
         })
       })
     })
