@@ -1,40 +1,29 @@
 "use strict"
 
-// With background scripts you can communicate with popup
-// and contentScript files.
-// For more information on background script,
 // See https://developer.chrome.com/extensions/background_pages
 
+import { AvailableStorage } from "./storage"
 import { FILTER_AVAILABLE, FILTER_UNAVAILABLE } from "./constant"
 
-let available = false
+let available: boolean
+function restoreMode() {
+  AvailableStorage.get((av: boolean) => {
+    if (typeof av === "undefined") {
+      av = false
+      AvailableStorage.set(av, () => undefined)
+    }
+    available = av
+  })
+}
 
-chrome.runtime.onMessage.addListener((request) => {
-  if (request.type === "TOGGLE_SWITCH") {
-    // toggle filter from frontend
-    available = request.payload.isChecked
-
+chrome.storage.onChanged.addListener(function (changes, area) {
+  if (area === "sync" && changes.available) {
+    available = changes.available.newValue
     available ? console.log(FILTER_AVAILABLE) : console.log(FILTER_UNAVAILABLE)
   }
-  return true
 })
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.type === "GREETINGS") {
-    const message = `Hi ${
-      sender.tab ? "Con" : "Pop"
-    }, my name is Bac. I am from Background. It's great to hear from you.`
-
-    // Log message coming from the `request` parameter
-    console.log(request.payload.message)
-    // Send a response message
-    sendResponse({
-      message,
-    })
-  }
-  return true
-})
-
+// apply filter
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   if (changeInfo.status === "complete") {
     console.log(`got url: ${tab.url}`)
@@ -55,7 +44,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 })
 
 function generate_filter(regex = false) {
-  const filter_array = ["somen", "からしな"]
+  const filter_array = ["somen", "からしな"] // TODO: あとからinteractiveな設定を可能にする
   let filter: string
   if (regex) {
     filter = filter_array.map((item) => encodeURIComponent(item)).join("+")
@@ -65,3 +54,21 @@ function generate_filter(regex = false) {
   console.log(`filter: ${filter}, regex: ${regex}`)
   return filter
 }
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.type === "GREETINGS") {
+    const message = `Hi ${
+      sender.tab ? "Con" : "Pop"
+    }, my name is Bac. I am from Background. It's great to hear from you.`
+
+    // Log message coming from the `request` parameter
+    console.log(request.payload.message)
+    // Send a response message
+    sendResponse({
+      message,
+    })
+  }
+  return true
+})
+
+restoreMode()

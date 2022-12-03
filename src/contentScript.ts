@@ -1,52 +1,52 @@
 "use strict"
 
-// Content script file will run in the context of web page.
-// With content script you can manipulate the web pages using
-// Document Object Model (DOM).
-// You can also pass information to the parent extension.
+import { AvailableStorage } from "./storage"
+;(function () {
+  function setupToggleSwitch(available: boolean) {
+    const toggle_filter = <HTMLButtonElement>document.createElement("button")
+    toggle_filter.id = "youtube-search-filter-toggle"
+    toggle_filter.innerHTML = `Filter is ${available ? "ON" : "OFF"}`
 
-// We execute this script by making an entry in manifest.json file
-// under `content_scripts` property
+    toggle_filter.onclick = () => {
+      available = !available
+      AvailableStorage.set(available, () => undefined)
+      setupToggleSwitch(available)
+    }
 
-// For more information on Content Scripts,
-// See https://developer.chrome.com/extensions/content_scripts
+    writeToggleSwitch(toggle_filter)
+  }
 
-// Log `title` of current active web page
-// const pageTitle = document.head.getElementsByTagName("title")[0].innerHTML
-// console.log(
-//   `Page title is: '${pageTitle}' - evaluated by Chrome extension's 'contentScript.js' file`
-// )
-// console.log("content script loaded")
+  function restoreToggleSwitch() {
+    AvailableStorage.get((available: boolean) => {
+      if (typeof available === "undefined") {
+        available = false
+        AvailableStorage.set(available, () => undefined)
+      }
+      setupToggleSwitch(available)
+    })
+  }
 
-// greet()
+  chrome.storage.onChanged.addListener(function (changes, area) {
+    if (area === "sync" && changes.available) {
+      const available: boolean = changes.available.newValue
+      setupToggleSwitch(available)
+    }
+  })
 
-// Communicate with background file by sending a message
-// function greet() {
-//   chrome.runtime.sendMessage(
-//     {
-//       type: "GREETINGS",
-//       payload: {
-//         message: "Hello, my name is Con. I am from ContentScript.",
-//       },
-//     },
-//     (response) => {
-//       if (chrome.runtime.lastError) {
-//         setTimeout(greet, 1000)
-//       } else {
-//         console.log(response.message)
-//       }
-//     }
-//   )
-// }
+  function writeToggleSwitch(button: HTMLButtonElement) {
+    const search_input = <HTMLInputElement>document.getElementById("center")
 
-// Listen for message
-// chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-//   if (request.type === "COUNT") {
-//     console.log(`Current count is ${request.payload.count}`)
-//   }
+    if (
+      <HTMLInputElement>document.getElementById("youtube-search-filter-toggle")
+    ) {
+      search_input.replaceChild(
+        button,
+        <HTMLInputElement>(
+          document.getElementById("youtube-search-filter-toggle")
+        )
+      )
+    } else search_input.appendChild(button)
+  }
 
-//   // Send an empty response
-//   // See https://github.com/mozilla/webextension-polyfill/issues/130#issuecomment-531531890
-//   sendResponse({})
-//   return true
-// })
+  restoreToggleSwitch()
+})()
