@@ -24,6 +24,8 @@
     "css-loader": "^6.7.2",
     "eslint": "^8.29.0",
     "eslint-config-prettier": "^8.5.0",
+    "eslint-import-resolver-typescript": "^3.5.2",
+    "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.2.1",
     "file-loader": "^6.2.0",
     "mini-css-extract-plugin": "^0.10.1",

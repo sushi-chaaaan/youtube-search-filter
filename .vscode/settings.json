@@ -18,5 +18,9 @@
             ],
             "url": "https://json.schemastore.org/chrome-manifest.json"
         }
-    ]
+    ],
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": true,
+        "source.fixAll": true
+    },
 }
