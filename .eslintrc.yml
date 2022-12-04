@@ -20,8 +20,22 @@ parserOptions:
 rules:
   {
     "import/order":
-      ["error", { "newlines-between": "always", ? // グループ間に空白行が入る
-            'alphabetize'
-          : { "order": "asc", // アルファベットの昇順に並び替えられる } }],
-    "semi": ["error", "never"], // セミコロンを禁止
+      [
+        "error",
+        {
+          "groups":
+            [
+              "builtin",
+              "external",
+              "internal",
+              "parent",
+              "sibling",
+              "index",
+              "object",
+              "type",
+            ],
+          "newlines-between": "always",
+          "alphabetize": { "order": "asc", "caseInsensitive": true },
+        },
+      ],
   }
