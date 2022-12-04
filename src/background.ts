@@ -30,10 +30,16 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, tab) {
     if (
       tab.url &&
       tab.url.match(/https?:\/\/www.youtube.com\/results?/) &&
+      // UI上は日本語URLだが、ブラウザ内部ではURLエンコードされたものが扱われている
+      // よって、URLがすでにフィルタ済みかどうかの判定処理のみURLエンコードされたもので行う。
+      // generate_filter(encode_url=true)
       !tab.url.includes(generate_filter(true)) &&
       current
     ) {
       console.log("url matched. adding filter")
+      // クエリがYoutubeのUIにも反映されるので
+      // 日本語のままURLを生成してリクエストする
+      // generate_filter(encode_url=false)
       const filter = generate_filter()
       const new_url = tab.url + "+" + filter
       chrome.tabs.update(tabId, { url: new_url })
@@ -56,15 +62,15 @@ async function is_available(): Promise<boolean> {
   })
 }
 
-function generate_filter(regex = false) {
+function generate_filter(encode_url = false) {
   const filter_array = ["somen", "からしな"] // TODO: あとからinteractiveな設定を可能にする
   let filter: string
-  if (regex) {
+  if (encode_url) {
     filter = filter_array.map((item) => encodeURIComponent(item)).join("+")
   } else {
     filter = filter_array.join("+")
   }
-  console.log(`filter: ${filter}, regex: ${regex}`)
+  console.log(`filter: ${filter}, encode_url: ${encode_url}`)
   return filter
 }
 
