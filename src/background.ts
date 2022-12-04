@@ -3,36 +3,35 @@
 import { FILTER_AVAILABLE, FILTER_UNAVAILABLE, Configuration } from "./constant"
 import { ConfigStorage } from "./storage"
 
-let available: boolean
 function setupConfig() {
   ConfigStorage.get((cf: Configuration) => {
     if (typeof cf === "undefined") {
       cf = <Configuration>{ available: false, filters: [] }
       ConfigStorage.set(cf, () => undefined)
     }
-    available = cf.available
   })
 }
 
 chrome.storage.onChanged.addListener(function (changes, area) {
-  if (area === "sync" && changes.yt_search_filter) {
-    const __config: Configuration = changes.yt_search_filter.newValue
-    __config.available
+  if (area === "local" && changes.yt_search_filter) {
+    changes.yt_search_filter.newValue.available
       ? console.log(FILTER_AVAILABLE)
       : console.log(FILTER_UNAVAILABLE)
   }
 })
 
 // apply filter
-chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, tab) {
   if (changeInfo.status === "complete") {
     console.log(`got url: ${tab.url}`)
+    const current: boolean = await is_available()
+    console.log(`got current: ${current}`)
 
     if (
       tab.url &&
       tab.url.match(/https?:\/\/www.youtube.com\/results?/) &&
       !tab.url.includes(generate_filter(true)) &&
-      available
+      current
     ) {
       console.log("url matched. adding filter")
       const filter = generate_filter()
@@ -42,6 +41,20 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   }
   return true
 })
+
+async function is_available(): Promise<boolean> {
+  return new Promise((resolve) => {
+    ConfigStorage.get((cf: Configuration) => {
+      if (typeof cf === "undefined") {
+        cf = <Configuration>{ available: false, filters: [] }
+        ConfigStorage.set(cf, () => undefined)
+        resolve(false)
+      } else {
+        resolve(cf.available)
+      }
+    })
+  })
+}
 
 function generate_filter(regex = false) {
   const filter_array = ["somen", "からしな"] // TODO: あとからinteractiveな設定を可能にする
