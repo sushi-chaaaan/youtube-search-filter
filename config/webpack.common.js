@@ -1,8 +1,8 @@
 "use strict"
 
-const SizePlugin = require("size-plugin")
 const CopyWebpackPlugin = require("copy-webpack-plugin")
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
+const SizePlugin = require("size-plugin")
 
 const PATHS = require("./paths")
 
