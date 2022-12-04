@@ -1,35 +1,41 @@
 "use strict"
 
-import { AvailableStorage } from "./storage"
+import { Configuration, FILTER_AVAILABLE, FILTER_UNAVAILABLE } from "./constant"
+import { ConfigStorage } from "./storage"
 
-function setupToggleSwitch(available: boolean) {
+function restoreToggleSwitch() {
+  ConfigStorage.get((config: Configuration) => {
+    if (typeof config === "undefined") {
+      config = <Configuration>{
+        available: false,
+        filters: [],
+      }
+      ConfigStorage.set(config, () => undefined)
+    }
+    setupToggleSwitch(config)
+  })
+}
+
+function setupToggleSwitch(config: Configuration) {
   const toggle_filter = <HTMLButtonElement>document.createElement("button")
   toggle_filter.id = "youtube-search-filter-toggle"
-  toggle_filter.innerHTML = `Filter is ${available ? "ON" : "OFF"}`
+  toggle_filter.innerHTML = config.available
+    ? FILTER_AVAILABLE
+    : FILTER_UNAVAILABLE
 
   toggle_filter.onclick = () => {
-    available = !available
-    AvailableStorage.set(available, () => undefined)
-    setupToggleSwitch(available)
+    config.available = !config.available
+    ConfigStorage.set(config, () => undefined)
+    setupToggleSwitch(config)
   }
 
   writeToggleSwitch(toggle_filter)
 }
 
-function restoreToggleSwitch() {
-  AvailableStorage.get((available: boolean) => {
-    if (typeof available === "undefined") {
-      available = false
-      AvailableStorage.set(available, () => undefined)
-    }
-    setupToggleSwitch(available)
-  })
-}
-
 chrome.storage.onChanged.addListener(function (changes, area) {
-  if (area === "sync" && changes.available) {
-    const available: boolean = changes.available.newValue
-    setupToggleSwitch(available)
+  if (area === "local" && changes.yt_search_filter) {
+    const __config: Configuration = changes.yt_search_filter.newValue
+    setupToggleSwitch(__config)
   }
 })
 

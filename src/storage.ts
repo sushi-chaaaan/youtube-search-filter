@@ -1,13 +1,15 @@
-export const AvailableStorage = {
-  get: (callback: (arg0: boolean) => void) => {
-    chrome.storage.sync.get(["available"], (result) => {
-      callback(result.available)
+import { Configuration } from "./constant"
+
+export const ConfigStorage = {
+  get: (callback: (arg0: Configuration) => void) => {
+    chrome.storage.local.get(["yt_search_filter"], (result) => {
+      callback(result.yt_search_filter)
     })
   },
-  set: (value: boolean, callback: () => void) => {
-    chrome.storage.sync.set(
+  set: (value: Configuration, callback: () => void) => {
+    chrome.storage.local.set(
       {
-        available: value,
+        yt_search_filter: value,
       },
       () => {
         callback()

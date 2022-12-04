@@ -1,33 +1,36 @@
 "use strict"
 
 import "./popup.css"
-import { FILTER_AVAILABLE, FILTER_UNAVAILABLE } from "./constant"
-import { AvailableStorage } from "./storage"
+import { FILTER_AVAILABLE, FILTER_UNAVAILABLE, Configuration } from "./constant"
+import { ConfigStorage } from "./storage"
 ;(function () {
-  function setupToggleSwitch(available: boolean) {
+  function setupToggleSwitch(config: Configuration) {
     const toggleSwitch = <HTMLInputElement>(
       document.getElementById("toggle-switch")
     )
     // set toggle switch to the current value
-    toggleSwitch.checked = available
-    writeToggleMessage(available)
+    toggleSwitch.checked = config.available
+    writeToggleMessage(config.available)
 
     // Popup上での切り替えを検知
     toggleSwitch.onchange = () => {
-      available = toggleSwitch.checked
-      AvailableStorage.set(available, () => undefined)
+      config.available = toggleSwitch.checked
+      ConfigStorage.set(config, () => undefined)
 
-      writeToggleMessage(available)
+      writeToggleMessage(config.available)
     }
   }
 
   function restoreToggleSwitch() {
-    AvailableStorage.get((available: boolean) => {
-      if (typeof available === "undefined") {
-        available = false
-        AvailableStorage.set(available, () => undefined)
+    ConfigStorage.get((config: Configuration) => {
+      if (typeof config === "undefined") {
+        config = <Configuration>{
+          available: false,
+          filters: [],
+        }
+        ConfigStorage.set(config, () => undefined)
       }
-      setupToggleSwitch(available)
+      setupToggleSwitch(config)
     })
   }
 
@@ -39,9 +42,9 @@ import { AvailableStorage } from "./storage"
   }
 
   chrome.storage.onChanged.addListener(function (changes, area) {
-    if (area === "sync" && changes.available) {
-      const available: boolean = changes.available.newValue
-      setupToggleSwitch(available)
+    if (area === "local" && changes.yt_search_filter) {
+      const __config: Configuration = changes.yt_search_filter.newValue
+      setupToggleSwitch(__config)
     }
   })
 

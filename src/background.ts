@@ -1,23 +1,25 @@
 "use strict"
 
-import { AvailableStorage } from "./storage"
-import { FILTER_AVAILABLE, FILTER_UNAVAILABLE } from "./constant"
+import { FILTER_AVAILABLE, FILTER_UNAVAILABLE, Configuration } from "./constant"
+import { ConfigStorage } from "./storage"
 
 let available: boolean
-function restoreMode() {
-  AvailableStorage.get((av: boolean) => {
-    if (typeof av === "undefined") {
-      av = false
-      AvailableStorage.set(av, () => undefined)
+function setupConfig() {
+  ConfigStorage.get((cf: Configuration) => {
+    if (typeof cf === "undefined") {
+      cf = <Configuration>{ available: false, filters: [] }
+      ConfigStorage.set(cf, () => undefined)
     }
-    available = av
+    available = cf.available
   })
 }
 
 chrome.storage.onChanged.addListener(function (changes, area) {
-  if (area === "sync" && changes.available) {
-    available = changes.available.newValue
-    available ? console.log(FILTER_AVAILABLE) : console.log(FILTER_UNAVAILABLE)
+  if (area === "sync" && changes.yt_search_filter) {
+    const __config: Configuration = changes.yt_search_filter.newValue
+    __config.available
+      ? console.log(FILTER_AVAILABLE)
+      : console.log(FILTER_UNAVAILABLE)
   }
 })
 
@@ -69,4 +71,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   return true
 })
 
-restoreMode()
+chrome.runtime.onInstalled.addListener(() => {
+  setupConfig()
+})
+
+chrome.runtime.onStartup.addListener(() => {
+  setupConfig()
+})
