@@ -43,8 +43,7 @@ import { ConfigStorage } from "./storage"
 
   chrome.storage.onChanged.addListener(function (changes, area) {
     if (area === "local" && changes.yt_search_filter) {
-      const __config: Configuration = changes.yt_search_filter.newValue
-      setupToggleSwitch(__config)
+      setupToggleSwitch(changes.yt_search_filter.newValue)
     }
   })
 
